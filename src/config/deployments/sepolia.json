@@ -1,0 +1,33 @@
+{
+  "chainId": 11155111,
+  "network": "sepolia",
+  "factory": "0xc02bb24967d3cf2accab3d0b6439e8c2a3bfaa50",
+  "router": "0x90cac2443b6c7ac18aa401b75d0d3a1e74a2b931",
+  "weth": "0xc6c26f12c2e7f56e949820b18c2dcc8a13846e0f",
+  "tokens": [
+    {
+      "name": "Alyra Token",
+      "symbol": "ALY",
+      "decimals": 18,
+      "address": "0x52df5f056147c453be3e308409e05e875ed1f892"
+    },
+    {
+      "name": "USDC Mock",
+      "symbol": "mUSDC",
+      "decimals": 6,
+      "address": "0xb5dfc8a5dcc4931d25977457dda67406cb0e35fb"
+    },
+    {
+      "name": "DAI Mock",
+      "symbol": "mDAI",
+      "decimals": 18,
+      "address": "0xa013db9e6437eef2b3d6e72840967ace9bd520bf"
+    },
+    {
+      "name": "Wrapped Bitcoin Mock",
+      "symbol": "mWBTC",
+      "decimals": 8,
+      "address": "0xc884a6c54cecc870bf60262155dbeec2dc5ef4fe"
+    }
+  ]
+}
