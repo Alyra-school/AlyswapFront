@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { formatUnits, parseUnits } from "viem";
 import { useAccount, usePublicClient, useReadContract, useWriteContract } from "wagmi";
 import { erc20Abi } from "@/contracts/abis";
@@ -17,6 +17,7 @@ function statusClass(state: TxState) {
 }
 
 export function SwapForm() {
+  const [mounted, setMounted] = useState(false);
   const { chainId, address } = useAccount();
   const { deployment, router } = getContractsByChain(chainId);
   const tokens = deployment.tokens;
@@ -33,6 +34,11 @@ export function SwapForm() {
   const { pushToast } = useToast();
 
   const enabled = Boolean(fromToken && toToken && fromToken.address !== toToken.address && address);
+  const canSubmit = mounted && enabled;
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const quote = useReadContract({
     abi: router.abi,
@@ -110,7 +116,7 @@ export function SwapForm() {
       <input value={amount} onChange={(e) => setAmount(e.target.value)} />
 
       <p className="kv"><strong>Quote Out:</strong> {quotedOut} {toToken?.symbol ?? ""}</p>
-      <button onClick={onSwap} disabled={!enabled}>Approve + Swap</button>
+      <button onClick={onSwap} disabled={!canSubmit}>Approve + Swap</button>
 
       <div className={statusClass(txState)}>State: {txState}</div>
       {error ? <p className="error-text">{error}</p> : null}

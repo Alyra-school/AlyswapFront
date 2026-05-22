@@ -26,6 +26,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             <Link href="/swap" className={pathname === "/swap" ? "active" : ""}>Swap</Link>
             <Link href="/pool" className={pathname === "/pool" || pathname === "/create-pair" ? "active" : ""}>Pool</Link>
             <Link href="/tokens" className={pathname === "/tokens" ? "active" : ""}>Token</Link>
+            <Link href="/rewards" className={pathname === "/rewards" ? "active" : ""}>Rewards</Link>
           </nav>
         </div>
         <WalletButton />

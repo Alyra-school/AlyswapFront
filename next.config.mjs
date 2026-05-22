@@ -7,8 +7,6 @@ const nextConfig = {
     config.resolve.alias["pino-pretty"] = false;
     config.resolve.alias["porto/internal"] = false;
     config.resolve.alias.porto = false;
-    config.resolve.alias["@metamask/connect-evm"] = false;
-    config.resolve.alias.accounts = false;
     return config;
   }
 };
