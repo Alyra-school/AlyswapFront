@@ -3,7 +3,7 @@ import { TokenFaucet } from "@/components/token-faucet";
 
 export default function TokensPage() {
   return (
-    <div className="grid">
+    <div className="grid tokens-layout">
       <TokenBalances />
       <TokenFaucet />
     </div>

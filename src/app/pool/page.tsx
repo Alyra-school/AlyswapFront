@@ -1,11 +1,5 @@
-import { PoolForm } from "@/components/pool-form";
-import { CreatePairForm } from "@/components/create-pair-form";
+import { PoolExplorer } from "@/components/pool-explorer";
 
 export default function PoolPage() {
-  return (
-    <div className="grid">
-      <PoolForm />
-      <CreatePairForm />
-    </div>
-  );
+  return <PoolExplorer />;
 }

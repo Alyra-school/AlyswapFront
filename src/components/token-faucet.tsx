@@ -26,9 +26,10 @@ export function TokenFaucet() {
       pushToast(`Mint ${token.symbol} en cours...`, "info");
       addActivity("Faucet", `Mint 100 ${token.symbol}`, "pending");
       setStatus(`minting-${token.symbol}`);
+      const targetAddress = token.symbol === "mWBTC" ? deployment.tokens[0]?.address ?? token.address : token.address;
       const hash = await writeContractAsync({
         abi: erc20Abi,
-        address: token.address,
+        address: targetAddress,
         functionName: "mint",
         args: [address, amount]
       });

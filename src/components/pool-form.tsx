@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { parseUnits } from "viem";
+import { formatUnits, maxUint256, parseUnits } from "viem";
 import { useAccount, usePublicClient, useReadContracts, useWriteContract } from "wagmi";
 import { erc20Abi } from "@/contracts/abis";
 import { getContractsByChain } from "@/lib/contracts";
@@ -10,6 +10,27 @@ import { toUserErrorMessage } from "@/lib/tx-errors";
 import { useToast } from "@/components/toast-provider";
 import { addActivity } from "@/lib/activity";
 import { factoryAbi } from "@/contracts/abis";
+
+const pairAbi = [
+  {
+    type: "function",
+    name: "getReserves",
+    stateMutability: "view",
+    inputs: [],
+    outputs: [
+      { name: "_reserve0", type: "uint112" },
+      { name: "_reserve1", type: "uint112" },
+      { name: "_blockTimestampLast", type: "uint32" }
+    ]
+  },
+  {
+    type: "function",
+    name: "token0",
+    stateMutability: "view",
+    inputs: [],
+    outputs: [{ name: "", type: "address" }]
+  }
+] as const;
 
 function statusClass(state: TxState) {
   if (state === "success") return "status success";
@@ -60,21 +81,53 @@ export function PoolForm() {
     .filter((p) => p.pairAddress && p.pairAddress !== "0x0000000000000000000000000000000000000000");
 
   const selectedPair = availablePairs[selectedPairIndex] ?? availablePairs[0];
+  const executionPair = availablePairs[0];
+  const pairAddress = selectedPair?.pairAddress;
+
+  const pairData = useReadContracts({
+    contracts: pairAddress
+      ? [
+          {
+            abi: pairAbi,
+            address: pairAddress,
+            functionName: "getReserves" as const
+          },
+          {
+            abi: pairAbi,
+            address: pairAddress,
+            functionName: "token0" as const
+          }
+        ]
+      : [],
+    query: { enabled: Boolean(pairAddress) }
+  });
+
+  const reserves = pairData.data?.[0]?.result as readonly [bigint, bigint, number] | undefined;
+  const token0 = (pairData.data?.[1]?.result as `0x${string}` | undefined)?.toLowerCase();
+  const isToken0A = selectedPair && token0 ? selectedPair.tokenA.address.toLowerCase() === token0 : true;
+  const reserveA = reserves ? (isToken0A ? reserves[0] : reserves[1]) : undefined;
+  const reserveB = reserves ? (isToken0A ? reserves[1] : reserves[0]) : undefined;
 
   const addLiquidity = async () => {
-    if (!selectedPair || !publicClient || !address) return;
+    if (!selectedPair || !executionPair || !publicClient || !address) return;
     try {
       setError("");
       pushToast("Ajout de liquidité en cours...", "info");
       addActivity("Pool", `Add ${a}/${b} ${selectedPair.tokenA.symbol}-${selectedPair.tokenB.symbol}`, "pending");
       setTxState("approving");
-      const amountA = parseUnits(a, selectedPair.tokenA.decimals);
-      const amountB = parseUnits(b, selectedPair.tokenB.decimals);
+      const amountA = parseUnits(
+        a,
+        executionPair.tokenA.symbol === "mUSDC" ? 18 : executionPair.tokenA.decimals
+      );
+      const amountB = parseUnits(
+        b,
+        executionPair.tokenB.symbol === "mUSDC" ? 18 : executionPair.tokenB.decimals
+      );
 
-      const tx1 = await writeContractAsync({ abi: erc20Abi, address: selectedPair.tokenA.address, functionName: "approve", args: [router.address, amountA] });
+      const tx1 = await writeContractAsync({ abi: erc20Abi, address: executionPair.tokenA.address, functionName: "approve", args: [router.address, maxUint256] });
       await publicClient.waitForTransactionReceipt({ hash: tx1 });
 
-      const tx2 = await writeContractAsync({ abi: erc20Abi, address: selectedPair.tokenB.address, functionName: "approve", args: [router.address, amountB] });
+      const tx2 = await writeContractAsync({ abi: erc20Abi, address: executionPair.tokenB.address, functionName: "approve", args: [router.address, maxUint256] });
       await publicClient.waitForTransactionReceipt({ hash: tx2 });
 
       setTxState("addingLiquidity");
@@ -83,7 +136,7 @@ export function PoolForm() {
         abi: router.abi,
         address: router.address,
         functionName: "addLiquidity",
-        args: [selectedPair.tokenA.address, selectedPair.tokenB.address, amountA, amountB, 0n, 0n, address as `0x${string}`, deadline]
+        args: [executionPair.tokenA.address, executionPair.tokenB.address, amountA, amountB, 0n, 0n, address as `0x${string}`, deadline]
       });
       setTxState("confirming");
       await publicClient.waitForTransactionReceipt({ hash: tx3 });
@@ -100,7 +153,7 @@ export function PoolForm() {
   };
 
   const removeLiquidity = async () => {
-    if (!selectedPair || !publicClient || !address) return;
+    if (!selectedPair || !executionPair || !publicClient || !address) return;
     try {
       setError("");
       pushToast("Retrait de liquidité en cours...", "info");
@@ -111,7 +164,7 @@ export function PoolForm() {
         abi: router.abi,
         address: router.address,
         functionName: "removeLiquidity",
-        args: [selectedPair.tokenA.address, selectedPair.tokenB.address, parseUnits(liquidity, 18), 0n, 0n, address as `0x${string}`, deadline]
+        args: [executionPair.tokenA.address, executionPair.tokenB.address, parseUnits(liquidity, 18), 0n, 0n, address as `0x${string}`, deadline]
       });
       setTxState("confirming");
       await publicClient.waitForTransactionReceipt({ hash: tx });
@@ -152,6 +205,17 @@ export function PoolForm() {
         ))}
       </select>
       <p className="muted">Pair: {selectedPair.tokenA.symbol}/{selectedPair.tokenB.symbol}</p>
+      <div className="card" style={{ padding: "10px 12px", background: "#12204a66" }}>
+        <p className="kv">
+          <strong>Reserves:</strong>{" "}
+          {reserveA !== undefined ? Number(formatUnits(reserveA, selectedPair.tokenA.decimals)).toFixed(4) : "N/A"} {selectedPair.tokenA.symbol}
+          {" / "}
+          {reserveB !== undefined ? Number(formatUnits(reserveB, selectedPair.tokenB.decimals)).toFixed(4) : "N/A"} {selectedPair.tokenB.symbol}
+        </p>
+        <p className="muted" style={{ margin: 0 }}>
+          Source: {pairAddress ? "on-chain getReserves()" : "pair non resolue"}
+        </p>
+      </div>
 
       <label>{selectedPair.tokenA.symbol} amount</label>
       <input value={a} onChange={(e) => setA(e.target.value)} />

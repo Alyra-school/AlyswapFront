@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useAccount, usePublicClient, useWriteContract } from "wagmi";
+import { useAccount, usePublicClient, useReadContract, useWriteContract } from "wagmi";
 import { getContractsByChain } from "@/lib/contracts";
 import { toUserErrorMessage } from "@/lib/tx-errors";
 import { useToast } from "@/components/toast-provider";
@@ -18,10 +18,29 @@ export function CreatePairForm() {
   const { writeContractAsync } = useWriteContract();
   const publicClient = usePublicClient();
   const { pushToast } = useToast();
-  const tokens = deployment.tokens;
+  const tokens = [
+    { name: "Ether", symbol: "ETH", decimals: 18, address: deployment.weth },
+    ...deployment.tokens
+  ];
+  const tokenA = tokens[a];
+  const tokenB = tokens[b];
+
+  const pairRead = useReadContract({
+    abi: factory.abi,
+    address: factory.address,
+    functionName: "getPair",
+    args: tokenA && tokenB ? [tokenA.address, tokenB.address] : undefined,
+    query: { enabled: Boolean(tokenA && tokenB) }
+  });
+
+  const existingPairAddress = pairRead.data as `0x${string}` | undefined;
+  const isExistingPair =
+    Boolean(existingPairAddress) && existingPairAddress !== "0x0000000000000000000000000000000000000000";
+  const isSameToken = a === b;
+  const isCreateDisabled = isSameToken || isExistingPair;
 
   const onCreate = async () => {
-    if (!tokens[a] || !tokens[b] || !publicClient) return;
+    if (!tokens[a] || !tokens[b] || !publicClient || isCreateDisabled) return;
     try {
       setError("");
       setStatus("creating");
@@ -31,7 +50,7 @@ export function CreatePairForm() {
         abi: factory.abi,
         address: factory.address,
         functionName: "createPair",
-        args: [tokens[a].address, tokens[b].address]
+        args: [tokens[a].address as `0x${string}`, tokens[b].address as `0x${string}`]
       });
       await publicClient.waitForTransactionReceipt({ hash });
       setStatus("success");
@@ -65,7 +84,16 @@ export function CreatePairForm() {
         {tokens.map((t, i) => <option key={t.address} value={i}>{t.symbol}</option>)}
       </select>
 
-      <button onClick={onCreate}>Create Pair</button>
+      {isSameToken ? (
+        <p className="error-text">Token A et Token B doivent être différents.</p>
+      ) : null}
+      {isExistingPair ? (
+        <p className="error-text">
+          Cette paire existe déjà: {existingPairAddress}
+        </p>
+      ) : null}
+
+      <button onClick={onCreate} disabled={isCreateDisabled}>Create Pair</button>
       <div className={status === "error" ? "status error" : status === "success" ? "status success" : "status"}>State: {status}</div>
       {error ? <p className="error-text">{error}</p> : null}
     </div>
