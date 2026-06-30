@@ -21,32 +21,40 @@ export default function Home() {
       <section className="hero-shell card">
         <div className="hero-copy">
           <p className="hero-kicker">AlySwap Protocol</p>
-          <h2 className="hero-title">L&apos;AMM d&apos;Alyra avec des failles...</h2>
+          <h2 className="hero-title">L&apos;AMM pédagogique d&apos;Alyra pour explorer le swap et la liquidité</h2>
           <p className="muted">
-            Simule des swaps, crée des paires, ajoute de la liquidité et observe le comportement du protocole !.
+            Simule des swaps, crée des paires, alimente des pools et observe les mécaniques d&apos;un protocole AMM dans un environnement de démonstration.
+          </p>
+          <p className="hero-disclaimer">
+            Ceci est un produit d&apos;Alyra a destination pédagogique. Ne pas utiliser en production.
           </p>
         </div>
 
-        <div className="orbit-stage">
-          <div className="orbit-core">
+        <div className="signal-stage">
+          <div className="signal-core">
             <img src="/logov3.png" alt="AlySwap" />
           </div>
 
-          <div className="orbit-ring orbit-ring-a">
-            <span className="planet planet-a" />
-            <span className="planet planet-b" />
+          <div className="signal-wave signal-wave-a" />
+          <div className="signal-wave signal-wave-b" />
+          <div className="signal-wave signal-wave-c" />
+
+          <div className="signal-flow flow-a">
+            <span className="signal-dot" />
+            <span className="signal-dot" />
+            <span className="signal-dot" />
           </div>
 
-          <div className="orbit-ring orbit-ring-b">
-            <span className="planet planet-c" />
-            <span className="planet planet-d" />
-            <span className="planet planet-e" />
+          <div className="signal-flow flow-b">
+            <span className="signal-dot" />
+            <span className="signal-dot" />
+            <span className="signal-dot" />
           </div>
 
-          <Link href="/swap" className="orbit-tag tag-top-left">Swap Engine</Link>
-          <Link href="/pool" className="orbit-tag tag-top-right">Liquidity Layer</Link>
-          <Link href="/tokens" className="orbit-tag tag-bottom-left">Token Faucet</Link>
-          <div className="orbit-tag tag-bottom-right">... et des erreurs ?</div>
+          <Link href="/swap" className="signal-tag tag-top-left">Swap Sandbox</Link>
+          <Link href="/pool" className="signal-tag tag-top-right">Liquidity Lab</Link>
+          <Link href="/tokens" className="signal-tag tag-bottom-left">Token Faucet</Link>
+          <div className="signal-tag tag-bottom-right">Learning by doing</div>
         </div>
       </section>
 

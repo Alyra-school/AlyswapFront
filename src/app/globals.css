@@ -89,21 +89,33 @@ a { color: inherit; text-decoration: none; }
   display: grid;
   gap: 10px;
 }
+.hero-disclaimer {
+  margin: 2px 0 0 0;
+  padding: 10px 12px;
+  border: 1px solid rgba(255, 211, 122, 0.28);
+  border-radius: 12px;
+  background: rgba(255, 211, 122, 0.08);
+  color: #ffe3a3;
+  font-size: 0.9rem;
+}
 .hero-cta-row {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 10px;
   margin-top: 4px;
 }
-.orbit-stage {
+.signal-stage {
   position: relative;
   width: min(100%, 430px);
   aspect-ratio: 1 / 1;
   margin-inline: auto;
   border-radius: 22px;
-  background: radial-gradient(circle at center, #1c2b5a66 0%, #131f4600 70%);
+  overflow: hidden;
+  background:
+    radial-gradient(circle at center, rgba(73, 220, 177, 0.16) 0%, rgba(19, 31, 70, 0) 60%),
+    linear-gradient(145deg, rgba(17, 35, 79, 0.85), rgba(15, 27, 60, 0.45));
 }
-.orbit-core {
+.signal-core {
   position: absolute;
   top: 50%;
   left: 50%;
@@ -116,36 +128,66 @@ a { color: inherit; text-decoration: none; }
   display: grid;
   place-items: center;
   box-shadow: 0 0 0 10px #ffffff08;
+  z-index: 3;
 }
-.orbit-core img {
+.signal-core img {
   width: 56px;
   height: 56px;
 }
-.orbit-ring {
+.signal-wave {
   position: absolute;
-  inset: 14%;
-  border: 1.5px dashed #9fb3e033;
+  inset: 16%;
+  border: 1px solid rgba(115, 198, 255, 0.22);
   border-radius: 999px;
-  animation: orbitSpin 20s linear infinite;
+  animation: signalPulse 6s ease-in-out infinite;
 }
-.orbit-ring-b {
-  inset: 4%;
-  animation-duration: 30s;
-  animation-direction: reverse;
+.signal-wave-b {
+  inset: 8%;
+  animation-delay: 1.2s;
 }
-.planet {
+.signal-wave-c {
+  inset: 0;
+  animation-delay: 2.4s;
+}
+.signal-flow {
   position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  z-index: 2;
+}
+.flow-a {
+  top: 26%;
+  left: 16%;
+  width: 68%;
+  transform: rotate(-18deg);
+  animation: driftA 8s ease-in-out infinite;
+}
+.flow-b {
+  bottom: 24%;
+  left: 14%;
+  width: 72%;
+  transform: rotate(15deg);
+  animation: driftB 9s ease-in-out infinite;
+}
+.signal-dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #8ce7ff, #7affcf);
+  box-shadow: 0 0 22px rgba(140, 231, 255, 0.5);
+}
+.signal-dot:nth-child(2) {
   width: 18px;
   height: 18px;
-  border-radius: 999px;
-  box-shadow: 0 0 18px #ffffff66;
+  background: linear-gradient(135deg, #ffd37a, #ff9e7a);
 }
-.planet-a { top: -9px; left: 48%; background: #87d6ff; }
-.planet-b { bottom: 16%; right: -7px; background: #91efc8; width: 14px; height: 14px; }
-.planet-c { top: 12%; right: 8%; background: #ffc9f8; }
-.planet-d { bottom: 7%; left: 20%; background: #ffd09d; width: 22px; height: 22px; }
-.planet-e { top: 50%; left: -8px; background: #d9a8ff; width: 16px; height: 16px; }
-.orbit-tag {
+.signal-dot:nth-child(3) {
+  width: 12px;
+  height: 12px;
+  background: linear-gradient(135deg, #bca8ff, #8ce7ff);
+}
+.signal-tag {
   position: absolute;
   padding: 8px 12px;
   border-radius: 10px;
@@ -155,12 +197,13 @@ a { color: inherit; text-decoration: none; }
   font-weight: 700;
   font-size: 0.82rem;
   box-shadow: 0 6px 18px #00000026;
+  z-index: 4;
 }
-.orbit-stage a.orbit-tag {
+.signal-stage a.signal-tag {
   transition: 150ms ease;
 }
-.orbit-stage a.orbit-tag:hover,
-.orbit-stage a.orbit-tag:focus-visible {
+.signal-stage a.signal-tag:hover,
+.signal-stage a.signal-tag:focus-visible {
   transform: translateY(-1px);
   border-color: #5669ff;
   box-shadow: 0 8px 22px #00000033;
@@ -259,9 +302,33 @@ button:disabled { opacity: 0.5; cursor: not-allowed; }
   padding: 6px 10px;
 }
 
-@keyframes orbitSpin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+@keyframes signalPulse {
+  0%, 100% {
+    transform: scale(0.96);
+    opacity: 0.35;
+  }
+  50% {
+    transform: scale(1);
+    opacity: 0.8;
+  }
+}
+
+@keyframes driftA {
+  0%, 100% {
+    transform: rotate(-18deg) translateY(0);
+  }
+  50% {
+    transform: rotate(-12deg) translateY(-8px);
+  }
+}
+
+@keyframes driftB {
+  0%, 100% {
+    transform: rotate(15deg) translateY(0);
+  }
+  50% {
+    transform: rotate(9deg) translateY(10px);
+  }
 }
 
 @media (max-width: 760px) {
@@ -271,8 +338,8 @@ button:disabled { opacity: 0.5; cursor: not-allowed; }
   .nav-inline { width: 100%; }
   .hero-shell { grid-template-columns: 1fr; }
   .hero-cta-row { grid-template-columns: 1fr; }
-  .orbit-stage { max-width: 360px; }
-  .orbit-tag { font-size: 0.76rem; padding: 7px 10px; }
+  .signal-stage { max-width: 360px; }
+  .signal-tag { font-size: 0.76rem; padding: 7px 10px; }
   .tokens-layout {
     min-width: 980px;
     transform: translateX(-80px);

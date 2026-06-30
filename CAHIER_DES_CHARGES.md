@@ -120,10 +120,10 @@ Cela intègre des frais de 0.3% (1000 - 997 = 3).
   - mint de tokens de test,
   - retours transactionnels et erreurs user-friendly.
 
-### 4.5 Page Rewards (non implémentée, spécification cible)
+### 4.5 Page Rewards 
 Objectif: inciter la liquidité et/ou le volume de swap via des récompenses.
 
-#### 4.5.1 Sous-fonctionnalités prévues
+#### 4.5.1 Sous-fonctionnalités 
 - Vue des campagnes actives (`APR`, durée, paires éligibles).
 - Statut utilisateur:
   - stake LP en cours,
@@ -134,7 +134,7 @@ Objectif: inciter la liquidité et/ou le volume de swap via des récompenses.
   - `Unstake LP`,
   - `Claim Rewards`.
 
-#### 4.5.2 Logique Rewards envisagée
+#### 4.5.2 Logique Rewards 
 - Base de calcul: LP tokens stakés et/ou volume de swap.
 - Distribution continue par epoch/bloc.
 - Contrat `RewardsController` responsable des snapshots et claims.
@@ -184,15 +184,7 @@ Objectif: inciter la liquidité et/ou le volume de swap via des récompenses.
 - Message clair si mauvais réseau.
 - Synchronisation des données wallet (adresse, balance, chainId).
 
-### 6.3 Configuration requise
-Variables frontend:
-- `NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID`
-- `NEXT_PUBLIC_APP_URL`
-- `NEXT_PUBLIC_DEFAULT_NETWORK`
-- `NEXT_PUBLIC_ENABLE_SEPOLIA` (en phase test)
-- `NEXT_PUBLIC_SEPOLIA_RPC_URL` (si utilisé)
-
-### 6.4 Qualité attendue
+### 6.3 Qualité attendue
 - Pas d’erreurs d’hydratation côté Next.
 - Pas de blocage spinner permanent en condition nominale.
 - Gestion robuste des erreurs de signature/reject.
